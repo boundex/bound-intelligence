@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Repo Intelligence — Team Brief</title>
+<meta name="description" content="A 2-minute overview of the repo-intelligence system: mirror, digest, query — and how to switch it on." />
+<style>
+  :root{
+    --cherry-dark:#9c4846; --cherry-soda:#a55c55; --cherry-bright:#cc9e9a; --cherry-grey:#d7cdcb;
+    --yellow-dark:#ecc100; --yellow-soda:#ffd92f; --orange-sonic:#ff9048;
+    --espresso:#483534; --clay-dark:#6b5c5b; --clay:#8e7e7d; --clay-light:#b9acab;
+    --cream:#eaded4; --cream-white:#ede6e6; --almost-white:#f8f3f3; --vibrant-white:#f9f7f5;
+    --positive:#00a778;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--vibrant-white); color:var(--espresso);
+    font-family:var(--sans); font-size:15px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px 96px}
+  a{color:var(--cherry-dark); text-decoration:none; border-bottom:1px solid var(--cherry-bright)}
+  a:hover{color:var(--cherry-soda); border-bottom-color:var(--cherry-soda)}
+  code{font-family:var(--mono); font-size:.88em; background:var(--cream-white);
+       color:var(--espresso); padding:1px 6px; border-radius:5px}
+
+  /* hero */
+  .hero{padding:64px 0 40px; border-bottom:1px solid var(--cream)}
+  .eyebrow{font-family:var(--mono); font-size:12px; text-transform:uppercase;
+           letter-spacing:.12em; color:var(--cherry-soda); margin-bottom:16px}
+  h1{font-size:46px; line-height:1.04; letter-spacing:-1px; font-weight:800;
+     color:var(--cherry-dark); margin:0 0 18px}
+  .hero p{font-size:18px; color:var(--clay-dark); max-width:62ch; margin:0}
+  .hero .lead-accent{color:var(--espresso); font-weight:600}
+
+  /* section scaffolding */
+  section{padding:48px 0; border-bottom:1px solid var(--cream)}
+  section:last-of-type{border-bottom:none}
+  h2{font-size:13px; font-family:var(--mono); text-transform:uppercase; letter-spacing:.1em;
+     color:var(--clay); margin:0 0 8px; font-weight:600}
+  .h2-title{font-size:28px; font-weight:800; letter-spacing:-.4px; color:var(--espresso); margin:0 0 24px}
+  p{margin:0 0 16px; color:var(--clay-dark)}
+
+  /* two-up cards */
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .card{background:var(--almost-white); border:1px solid var(--cream);
+        border-radius:14px; padding:22px 22px 20px}
+  .card .tag{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+             color:var(--cherry-soda); margin-bottom:8px}
+  .card h3{margin:0 0 8px; font-size:18px; color:var(--espresso); font-weight:700}
+  .card p{margin:0; font-size:14px; color:var(--clay-dark)}
+  .card.accent{background:#fbf3df; border-color:#f1e2b4}
+  .card.accent .tag{color:#b88a00}
+
+  /* flow diagram */
+  .flowscroll{overflow-x:auto; padding:8px 2px 16px; margin:0 -2px}
+  .flow{display:flex; align-items:stretch; gap:0; min-width:680px}
+  .node{flex:1; background:#fff; border:1.5px solid var(--cherry-grey); border-radius:14px;
+        padding:18px 16px; text-align:center; position:relative}
+  .node .num{display:inline-flex; align-items:center; justify-content:center;
+             width:26px; height:26px; border-radius:50%; background:var(--cherry-dark);
+             color:#fff; font-size:13px; font-weight:700; margin-bottom:10px; font-family:var(--mono)}
+  .node h4{margin:0 0 6px; font-size:15px; color:var(--espresso); font-weight:700}
+  .node p{margin:0; font-size:12.5px; line-height:1.45; color:var(--clay)}
+  .arrow{display:flex; align-items:center; justify-content:center; flex:0 0 38px; color:var(--cherry-bright)}
+  .arrow svg{width:24px; height:24px}
+  .node.glow{border-color:var(--orange-sonic); box-shadow:0 0 0 3px rgba(255,144,72,.14)}
+  .node.glow .num{background:var(--orange-sonic)}
+
+  /* query strip */
+  .qstrip{background:var(--espresso); border-radius:16px; padding:26px 26px 22px; color:var(--cream)}
+  .qstrip .qrow{display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:14px; align-items:center}
+  .qbox{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+        border-radius:11px; padding:16px 16px}
+  .qbox .lbl{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em;
+             color:var(--cherry-bright); margin-bottom:7px}
+  .qbox .txt{font-size:13.5px; color:var(--vibrant-white); line-height:1.5}
+  .qbox .txt code{background:rgba(255,255,255,.1); color:#fff}
+  .qarrow{color:var(--orange-sonic); display:flex; align-items:center; justify-content:center}
+  .qarrow svg{width:22px; height:22px}
+  .qnote{margin:18px 0 0; font-size:13px; color:var(--cherry-grey)}
+  .qnote strong{color:var(--yellow-soda); font-weight:600}
+
+  /* day-to-day */
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+  .dcard{background:var(--almost-white); border:1px solid var(--cream); border-radius:14px; padding:20px}
+  .dcard .when{font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.07em;
+               color:var(--cherry-soda); margin-bottom:10px}
+  .dcard h4{margin:0 0 6px; font-size:16px; color:var(--espresso); font-weight:700}
+  .dcard p{margin:0; font-size:13.5px; color:var(--clay-dark)}
+
+  /* principles */
+  .principles{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:24px}
+  .pr{border-left:3px solid var(--yellow-dark); padding:2px 0 2px 14px}
+  .pr b{display:block; color:var(--espresso); font-size:13.5px; margin-bottom:3px}
+  .pr span{font-size:12.5px; color:var(--clay)}
+
+  /* v2 teaser */
+  .v2{background:linear-gradient(135deg,#fbf3df 0%,#f8f3f3 100%);
+      border:1px solid #f1e2b4; border-radius:16px; padding:30px}
+  .v2 .badge{display:inline-block; font-family:var(--mono); font-size:11px; letter-spacing:.08em;
+             text-transform:uppercase; color:#fff; background:var(--orange-sonic);
+             padding:4px 10px; border-radius:20px; margin-bottom:14px}
+  .v2 h3{margin:0 0 10px; font-size:22px; color:var(--espresso); font-weight:800; letter-spacing:-.3px}
+  .v2 p{margin:0 0 10px; color:var(--clay-dark); max-width:70ch}
+  .v2 .hint{font-size:13px; color:var(--clay); margin:0}
+  .v2 .hint code{background:#fff}
+
+  footer{padding:36px 0 0; color:var(--clay); font-size:12.5px}
+
+  @media (max-width:720px){
+    h1{font-size:34px}
+    .grid2,.grid3,.principles{grid-template-columns:1fr}
+    .qstrip .qrow{grid-template-columns:1fr; }
+    .qarrow{transform:rotate(90deg); padding:2px 0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Team brief · repo intelligence</div>
+    <h1>See everything your repos are doing — without reading every PR.</h1>
+    <p><span class="lead-accent">A small system you can stand up in an afternoon.</span>
+       It mirrors all your repositories locally, turns each week's merged PRs into a plain-English
+       report, and lets anyone ask the codebase a question and get an answer read straight from the
+       source. Here's what it does and how to switch it on.</p>
+  </div>
+
+  <section>
+    <h2>What you've been handed</h2>
+    <div class="h2-title">Two files</div>
+    <div class="grid2">
+      <div class="card accent">
+        <div class="tag">The runbook · .md</div>
+        <h3>repo-intelligence-playbook.md</h3>
+        <p>Drop this into your repo and tell your AI assistant: <em>"read this and set us up."</em>
+           It walks the assistant through discovering your repos, adapting the scripts, installing
+           them, and verifying each step. Real, copy-paste scripts inside.</p>
+      </div>
+      <div class="card">
+        <div class="tag">This brief · .html</div>
+        <h3>What you're reading now</h3>
+        <p>A 2-minute overview so the whole team understands the system without reading the runbook.
+           What the pieces are, how they connect, and how it feels to use once it's live.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <div class="h2-title">The core: mirror &rarr; digest &rarr; query</div>
+    <div class="flowscroll">
+      <div class="flow">
+        <div class="node">
+          <div class="num">1</div>
+          <h4>Your repos</h4>
+          <p>One list of every repository you want to track — the single source of truth.</p>
+        </div>
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node">
+          <div class="num">2</div>
+          <h4>Daily sync</h4>
+          <p>A scheduled script clones &amp; pulls them all every morning. Always-current local mirror.</p>
+        </div>
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node">
+          <div class="num">3</div>
+          <h4>Weekly digest</h4>
+          <p>Reads the week's merged PRs &amp; releases, writes a plain-English report of what shipped.</p>
+        </div>
+        <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node glow">
+          <div class="num">4</div>
+          <h4>Ask the code</h4>
+          <p>Anyone asks a question; the assistant reads the source and answers with citations.</p>
+        </div>
+      </div>
+    </div>
+    <div class="principles">
+      <div class="pr"><b>Read-only, always</b><span>The mirror only ever reads. It never pushes or edits your repos.</span></div>
+      <div class="pr"><b>Liveness from code</b><span>"Is X live?" is answered from what actually runs — not from stale docs.</span></div>
+      <div class="pr"><b>Automate, then verify</b><span>Sync &amp; digest run themselves; a human reads and asks.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The payoff</h2>
+    <div class="h2-title">What actually happens when you ask</div>
+    <div class="qstrip">
+      <div class="qrow">
+        <div class="qbox">
+          <div class="lbl">You ask</div>
+          <div class="txt">"Do we support webhook retries, and where's that handled?"</div>
+        </div>
+        <div class="qarrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="qbox">
+          <div class="lbl">Assistant reads the source</div>
+          <div class="txt">Routes to the right repo, opens the real files — guided by liveness rules, no guessing.</div>
+        </div>
+        <div class="qarrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="qbox">
+          <div class="lbl">You get a cited answer</div>
+          <div class="txt">"Yes — re-enqueued with backoff, max 5 attempts. See <code>api/src/queue/webhook.ts:42</code>."</div>
+        </div>
+      </div>
+      <p class="qnote"><strong>Why it's trustworthy:</strong> the answer comes from the code that
+        actually runs in production — never from a <code>.env.example</code>, a commented-out block,
+        or a doc that says "planned."</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Once it's set up</h2>
+    <div class="h2-title">How the team uses it day-to-day</div>
+    <div class="grid3">
+      <div class="dcard">
+        <div class="when">Every morning</div>
+        <h4>It syncs itself</h4>
+        <p>The mirror updates on a schedule. Nobody has to do anything — the source is always current.</p>
+      </div>
+      <div class="dcard">
+        <div class="when">Start of the week</div>
+        <h4>Read the digest</h4>
+        <p>One report tells you what shipped across every repo. No standups-by-DM, no chasing engineers.</p>
+      </div>
+      <div class="dcard">
+        <div class="when">Any time</div>
+        <h4>Ask the code</h4>
+        <p>PM, BD, or founder asks a question in plain English and gets a sourced answer in seconds.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="v2">
+      <div class="badge">Next iteration</div>
+      <h3>V2 — a knowledge base that compounds every answer</h3>
+      <p>The core above re-reads the code on every question. The next layer captures that
+         understanding into a living, sourced knowledge base — fed automatically from the same
+         weekly PR stream — so answers get faster and the team builds a self-maintaining map of
+         the whole codebase. Same inputs, compounding output.</p>
+      <p class="hint">Build it only once the core is part of your daily rhythm. Then tell your
+         assistant: <code>set up V2 from the playbook</code>.</p>
+    </div>
+  </section>
+
+  <footer>
+    Pair this brief with <code>repo-intelligence-playbook.md</code> — give that file to your AI
+    assistant to do the actual setup.
+  </footer>
+
+</div>
+</body>
+</html>

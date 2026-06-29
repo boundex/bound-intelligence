@@ -1,0 +1,10 @@
+repos/
+daily-reports/
+.sync.log
+.daily.log
+.daily-state.json
+.sync-stdout.log
+.sync-stderr.log
+.daily-stdout.log
+.daily-stderr.log
+
