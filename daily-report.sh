@@ -11,8 +11,9 @@ LOG_FILE="$WORKSPACE/.daily.log"
 REPORT="$WORKSPACE/repo-intelligence-report.html"
 SYNC_SCRIPT="$WORKSPACE/sync.sh"
 CODEX_BIN="/Applications/Codex.app/Contents/Resources/codex"
-TODAY=$(date "+%Y-%m-%d")
-NOW_HUMAN=$(date "+%Y-%m-%d %H:%M:%S %Z")
+DISPLAY_TZ="America/New_York"
+TODAY=$(TZ="$DISPLAY_TZ" date "+%Y-%m-%d")
+NOW_HUMAN=$(TZ="$DISPLAY_TZ" date "+%Y-%m-%d %H:%M:%S %Z")
 NOW_ISO=$(date -u "+%Y-%m-%dT%H:%M:%SZ")
 
 REPOS=(
@@ -30,6 +31,21 @@ mkdir -p "$WORKSPACE/daily-reports"
 
 timestamp() { date "+%Y-%m-%d %H:%M:%S"; }
 html_escape() { jq -Rr @html; }
+
+iso_to_display_time() {
+  local iso="$1"
+  local epoch
+  epoch=$(TZ=UTC date -j -f "%Y-%m-%dT%H:%M:%SZ" "$iso" "+%s" 2>/dev/null \
+    || date -u -d "$iso" "+%s" 2>/dev/null \
+    || printf '')
+  if [ -n "$epoch" ]; then
+    TZ="$DISPLAY_TZ" date -r "$epoch" "+%Y-%m-%d %H:%M:%S %Z" 2>/dev/null \
+      || TZ="$DISPLAY_TZ" date -d "@$epoch" "+%Y-%m-%d %H:%M:%S %Z" 2>/dev/null \
+      || printf '%s' "$iso"
+  else
+    printf '%s' "$iso"
+  fi
+}
 
 resolve_repo() {
   local entry="$1"
@@ -97,6 +113,7 @@ else
   LAST_RUN=$(date -u -v-1d "+%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -u -d '1 day ago' "+%Y-%m-%dT%H:%M:%SZ")
 fi
 LAST_RUN_DATE=${LAST_RUN%%T*}
+LAST_RUN_HUMAN=$(iso_to_display_time "$LAST_RUN")
 REPO_COUNT="${#REPOS[@]}"
 
 ACTIVE_COUNT=0
@@ -193,7 +210,7 @@ if [ ! -x "$CODEX_BIN" ] && command -v codex >/dev/null 2>&1; then
 fi
 
 if [ -x "$CODEX_BIN" ]; then
-  PROMPT="Write a concise daily executive engineering digest for Boundex covering $LAST_RUN to $NOW_ISO across $REPO_COUNT repos. The audience is business planning and external communications. Use plain text only: no Markdown headings, bold markers, bullets, or tables. Do not list every PR. Summarize concrete shipped work, fixes, and notable movement. Mention quiet repos briefly. Do not invent details. Source data:
+  PROMPT="Write a concise daily executive engineering digest for Boundex covering $LAST_RUN_HUMAN to $NOW_HUMAN across $REPO_COUNT repos. The audience is business planning and external communications. Use Eastern Time when referring to the reporting window. Use plain text only: no Markdown headings, bold markers, bullets, or tables. Do not list every PR. Summarize concrete shipped work, fixes, and notable movement. Mention quiet repos briefly. Do not invent details. Source data:
 $RAW_DATA"
   SUMMARY_FILE=$(mktemp "$WORKSPACE/.codex-summary.XXXXXX")
   SUMMARY=""
