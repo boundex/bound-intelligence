@@ -7,7 +7,7 @@
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>/Users/2infiniti/Desktop/dev/boundex-intelligence/daily-report.sh</string>
+        <string>/Users/2infiniti/Desktop/dev/bound-intelligence/daily-report.sh</string>
     </array>
     <key>StartCalendarInterval</key>
     <array>
@@ -15,9 +15,9 @@
         <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>30</integer></dict>
     </array>
     <key>StandardOutPath</key>
-    <string>/Users/2infiniti/Desktop/dev/boundex-intelligence/.daily-stdout.log</string>
+    <string>/Users/2infiniti/Desktop/dev/bound-intelligence/.daily-stdout.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/2infiniti/Desktop/dev/boundex-intelligence/.daily-stderr.log</string>
+    <string>/Users/2infiniti/Desktop/dev/bound-intelligence/.daily-stderr.log</string>
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>

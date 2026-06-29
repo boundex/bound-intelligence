@@ -3,7 +3,7 @@
 
 set -u
 
-WORKSPACE="/Users/2infiniti/Desktop/dev/boundex-intelligence"
+WORKSPACE="/Users/2infiniti/Desktop/dev/bound-intelligence"
 REPOS_DIR="$WORKSPACE/repos"
 GITHUB_ORG="boundex"
 STATE_FILE="$WORKSPACE/.daily-state.json"
@@ -72,7 +72,7 @@ code{background:#f0ece4;padding:2px 6px;border-radius:5px}
 <h1>Boundex Repo Intelligence</h1>
 <div class="notice">
 <p><strong>Setup needed:</strong> this report needs <code>gh</code>, <code>git</code>, and <code>jq</code>.</p>
-<p>Install GitHub CLI, run <code>gh auth login</code>, then run <code>/Users/2infiniti/Desktop/dev/boundex-intelligence/daily-report.sh</code> again.</p>
+<p>Install GitHub CLI, run <code>gh auth login</code>, then run <code>/Users/2infiniti/Desktop/dev/bound-intelligence/daily-report.sh</code> again.</p>
 </div>
 </main></body></html>
 HTML
