@@ -5,22 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Boundex Repo Intelligence</title>
 <style>
-:root{--ink:#2b2422;--muted:#766b67;--line:#ded2ca;--paper:#f8f3ef;--panel:#fffdfb;--lane:#efe7e1;--accent:#a24942;--good:#0f7b58;--blue:#3b6795;--quiet:#a19690;--shadow:0 8px 22px rgba(72,53,52,.07)}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
-a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(162,73,66,.28)}a:hover{border-bottom-color:var(--accent)}
-main{max-width:1440px;margin:0 auto;padding:34px 24px 60px}
-.page-header{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:20px;padding:18px 0 18px;border-bottom:1px solid var(--line)}
-h1{margin:0;font-size:35px;line-height:1.04;letter-spacing:0;font-weight:760}.meta{color:var(--muted);font-size:13px;white-space:nowrap}
+:root{--primary:#1a73e8;--primary-dark:#1558b0;--on-primary:#fff;--surface:#fff;--surface-variant:#f1f3f4;--background:#f8fafd;--outline:#dadce0;--outline-soft:#e8eaed;--text:#202124;--muted:#5f6368;--success:#188038;--progress:#1a73e8;--quiet:#9aa0a6;--warning:#f9ab00;--shadow-1:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15);--shadow-2:0 2px 6px rgba(60,64,67,.22),0 1px 2px rgba(60,64,67,.14)}
+*{box-sizing:border-box}body{margin:0;background:var(--background);color:var(--text);font-family:Roboto,Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
+main{max-width:1440px;margin:0 auto;padding:28px 24px 56px}
+.page-header{display:flex;justify-content:space-between;gap:24px;align-items:center;margin-bottom:22px;padding:18px 20px;background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;box-shadow:var(--shadow-1)}
+h1{margin:0;font-size:30px;line-height:1.1;letter-spacing:0;font-weight:500}.meta{color:var(--muted);font-size:13px;white-space:nowrap}
 .topbar{margin-bottom:22px}
-.summary{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:22px 24px;box-shadow:var(--shadow)}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 10px;font-weight:800}.summary p{margin:0;font-size:15px;max-width:110ch}
+.summary{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:22px 24px;box-shadow:var(--shadow-1);position:relative}.summary:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--primary);border-radius:8px 0 0 8px}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:700}.summary p{margin:0;font-size:15px;max-width:112ch}
 .board-wrap{overflow-x:auto;padding:2px 2px 14px}.board{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:18px;min-width:980px}
-.lane{background:var(--lane);border:1px solid var(--line);border-radius:8px;padding:14px;min-height:380px}.lane header{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid #dccfc6}.lane h2{margin:0;font-size:16px}.lane-count{color:var(--muted);font-size:12px;font-weight:700}
-.repo-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:15px;margin-bottom:12px;box-shadow:0 5px 14px rgba(72,53,52,.055);transition:transform .15s ease,box-shadow .15s ease}.repo-card:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(72,53,52,.09)}.repo-card.completed{border-top:4px solid var(--good)}.repo-card.active{border-top:4px solid var(--blue)}.repo-card.quiet{border-top:4px solid var(--quiet)}
-.card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.repo-name{font-weight:800;color:var(--ink);border-bottom:0}.repo-subtitle{color:var(--muted);font-size:12px;margin-top:2px}.badge{border-radius:999px;background:#f2ece8;color:var(--muted);font-size:11px;font-weight:800;padding:4px 9px;white-space:nowrap}.completed .badge{background:#e3f3ec;color:var(--good)}.active .badge{background:#e7edf5;color:var(--blue)}
-.count-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.count-row span{background:#fbf7f3;border:1px solid #e8ddd4;border-radius:7px;padding:8px;font-size:12px;color:var(--muted)}.count-row b{display:block;color:var(--ink);font-size:19px;line-height:1.05}
-.card-actions{display:flex;gap:8px;margin-bottom:10px}.card-actions a{background:#fbf7f3;border:1px solid #e5d8cf;border-radius:7px;padding:6px 10px;font-size:12px;font-weight:750;color:var(--ink)}
-details{border-top:1px solid var(--line);padding-top:9px}summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:700}h3{font-size:11px;margin:12px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}ul{margin:0;padding-left:18px}li{margin:5px 0;font-size:13px;overflow-wrap:anywhere}li span{color:var(--muted)}.muted{color:var(--muted)}.empty-lane{border:1px dashed #cfc0b7;border-radius:8px;color:var(--muted);padding:18px;text-align:center;background:rgba(255,255,255,.48);font-size:13px;font-weight:700}
-@media(max-width:860px){main{padding:22px 14px 44px}.page-header{display:block;padding-top:12px}h1{font-size:30px}.meta{display:inline-block;margin-top:12px;white-space:normal}.summary{padding:18px}.board{grid-template-columns:1fr;min-width:0}.board-wrap{overflow-x:visible}}
+.lane{background:var(--surface-variant);border:1px solid var(--outline-soft);border-radius:8px;padding:14px;min-height:380px}.lane header{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px;padding:0 2px 10px;border-bottom:1px solid var(--outline)}.lane h2{margin:0;font-size:16px;font-weight:500}.lane-count{color:var(--muted);font-size:12px;font-weight:500}
+.repo-card{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:15px;margin-bottom:12px;box-shadow:var(--shadow-1);transition:box-shadow .15s ease,transform .15s ease}.repo-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-2)}.repo-card.completed{border-left:4px solid var(--success)}.repo-card.active{border-left:4px solid var(--progress)}.repo-card.quiet{border-left:4px solid var(--quiet)}
+.card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.repo-name{font-weight:500;color:var(--text);font-size:15px}.repo-subtitle{color:var(--muted);font-size:12px;margin-top:2px}.badge{border-radius:999px;background:#eef0f2;color:var(--muted);font-size:11px;font-weight:500;padding:4px 10px;white-space:nowrap}.completed .badge{background:#e6f4ea;color:var(--success)}.active .badge{background:#e8f0fe;color:var(--progress)}
+.count-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.count-row span{background:#fafafa;border:1px solid var(--outline-soft);border-radius:8px;padding:8px;font-size:12px;color:var(--muted)}.count-row b{display:block;color:var(--text);font-size:20px;font-weight:500;line-height:1.05}
+.card-actions{display:flex;gap:8px;margin-bottom:10px}.card-actions a{background:#e8f0fe;border:1px solid #d2e3fc;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--primary)}
+details{border-top:1px solid var(--outline-soft);padding-top:9px}summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:500}h3{font-size:11px;margin:12px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}ul{margin:0;padding-left:18px}li{margin:5px 0;font-size:13px;overflow-wrap:anywhere}li span{color:var(--muted)}.muted{color:var(--muted)}.empty-lane{border:1px dashed var(--outline);border-radius:8px;color:var(--muted);padding:18px;text-align:center;background:rgba(255,255,255,.68);font-size:13px;font-weight:500}
+@media(max-width:860px){main{padding:18px 12px 44px}.page-header{display:block;padding:16px}h1{font-size:26px}.meta{display:inline-block;margin-top:10px;white-space:normal}.summary{padding:18px}.board{grid-template-columns:1fr;min-width:0}.board-wrap{overflow-x:visible}}
 </style>
 </head>
 <body>
@@ -29,12 +29,12 @@ details{border-top:1px solid var(--line);padding-top:9px}summary{cursor:pointer;
   <div>
     <h1>Boundex Repo Intelligence</h1>
   </div>
-  <div class="meta">Updated 2026-06-29 08:37:14 EDT</div>
+  <div class="meta">Updated 2026-06-29 10:28:17 EDT</div>
 </header>
 <section class="topbar">
   <div class="summary">
     <h2>2026-06-29 Daily Summary</h2>
-    <p>Boundex engineering digest for June 29, 2026, 08:33:14 EDT to 08:37:14 EDT.<br><br>Across the eight tracked repositories, there were no releases, merged PRs, or commits during this four-minute reporting window. No shipped product work, fixes, infrastructure changes, or documentation updates were recorded in the provided source data.<br><br>The monitored repos were quiet: radfi-web, ordinal-provider, ord-indexer, bound_lending, bound_lending_solver, bound_marketing_mcp, bound-dashboard, and docs_bound_exchange.</p>
+    <p>Boundex engineering digest for June 29, 2026, 8:37:14 AM EDT to 10:28:17 AM EDT<br><br>Across the eight tracked repositories, there were no releases, merged pull requests, or commits during this reporting window. No shipped product work, fixes, infrastructure changes, or documentation updates were recorded in the provided source data.<br><br>radfi-web, ordinal-provider, ord-indexer, bound_lending, bound_lending_solver, bound_marketing_mcp, bound-dashboard, and docs_bound_exchange were all quiet for this period.</p>
   </div>
 </section>
 <section>
