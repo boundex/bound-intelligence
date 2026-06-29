@@ -233,21 +233,20 @@ cat > "$REPORT.tmp" <<HTML
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Boundex Repo Intelligence</title>
 <style>
-:root{--ink:#24211e;--muted:#70695f;--line:#d9d0c2;--paper:#f6f3ec;--panel:#fffdfa;--lane:#eee8dc;--accent:#b73f35;--gold:#c5961a;--good:#087b5a;--blue:#2f6f9f;--shadow:0 12px 30px rgba(36,33,30,.08)}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fbfaf6 0%,var(--paper) 34%,#efeadf 100%);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
-a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(183,63,53,.28)}a:hover{border-bottom-color:var(--accent)}
+:root{--ink:#202124;--muted:#6b7280;--line:#d7dce2;--paper:#f5f6f8;--panel:#ffffff;--lane:#eef1f4;--accent:#2563eb;--good:#15803d;--blue:#2563eb;--quiet:#8a94a3;--shadow:0 10px 24px rgba(32,33,36,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(37,99,235,.28)}a:hover{border-bottom-color:var(--accent)}
 main{max-width:1440px;margin:0 auto;padding:34px 24px 60px}
-.page-header{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:20px;padding:22px 0 18px;border-bottom:1px solid var(--line)}
-.kicker{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:800;margin-bottom:8px}
-h1{margin:0;font-size:38px;line-height:1.02;letter-spacing:0}.meta{color:var(--muted);font-size:13px;background:#fff8eb;border:1px solid #ead9ac;border-radius:999px;padding:7px 11px;white-space:nowrap}
+.page-header{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:20px;padding:20px 0 18px;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:36px;line-height:1.04;letter-spacing:0}.meta{color:var(--muted);font-size:13px;white-space:nowrap}
 .topbar{margin-bottom:22px}
-.summary{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:8px;padding:22px 24px;box-shadow:var(--shadow)}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 10px;font-weight:800}.summary p{margin:0;font-size:15px;max-width:110ch}
+.summary{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:8px;padding:22px 24px;box-shadow:var(--shadow)}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 10px;font-weight:800}.summary p{margin:0;font-size:15px;max-width:110ch}
 .board-wrap{overflow-x:auto;padding:2px 2px 14px}.board{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:18px;min-width:980px}
-.lane{background:rgba(238,232,220,.78);border:1px solid var(--line);border-radius:8px;padding:14px;min-height:380px;box-shadow:0 1px 0 rgba(36,33,30,.05) inset}.lane header{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid rgba(112,105,95,.18)}.lane h2{margin:0;font-size:16px}.lane-count{color:var(--muted);font-size:12px;font-weight:700}
-.repo-card{background:var(--panel);border:1px solid rgba(217,208,194,.95);border-radius:8px;padding:15px;margin-bottom:12px;box-shadow:0 7px 18px rgba(36,33,30,.06);transition:transform .15s ease,box-shadow .15s ease}.repo-card:hover{transform:translateY(-1px);box-shadow:0 11px 22px rgba(36,33,30,.09)}.repo-card.completed{border-top:4px solid var(--good)}.repo-card.active{border-top:4px solid var(--blue)}.repo-card.quiet{border-top:4px solid #9b9387}
-.card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.repo-name{font-weight:800;color:var(--ink);border-bottom:0}.repo-subtitle{color:var(--muted);font-size:12px;margin-top:2px}.badge{border-radius:999px;background:#f0ece4;color:var(--muted);font-size:11px;font-weight:800;padding:4px 9px;white-space:nowrap}.completed .badge{background:#dff2eb;color:var(--good)}.active .badge{background:#e1edf5;color:var(--blue)}
-.count-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.count-row span{background:#f6f1e8;border:1px solid #e6ddce;border-radius:7px;padding:8px;font-size:12px;color:var(--muted)}.count-row b{display:block;color:var(--ink);font-size:19px;line-height:1.05}
-.card-actions{display:flex;gap:8px;margin-bottom:10px}.card-actions a{background:#fff7ea;border:1px solid #ead9ac;border-radius:7px;padding:6px 10px;font-size:12px;font-weight:750;color:var(--ink)}
+.lane{background:var(--lane);border:1px solid var(--line);border-radius:8px;padding:14px;min-height:380px}.lane header{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid rgba(107,114,128,.22)}.lane h2{margin:0;font-size:16px}.lane-count{color:var(--muted);font-size:12px;font-weight:700}
+.repo-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:15px;margin-bottom:12px;box-shadow:0 6px 16px rgba(32,33,36,.06);transition:transform .15s ease,box-shadow .15s ease}.repo-card:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(32,33,36,.1)}.repo-card.completed{border-top:4px solid var(--good)}.repo-card.active{border-top:4px solid var(--blue)}.repo-card.quiet{border-top:4px solid var(--quiet)}
+.card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.repo-name{font-weight:800;color:var(--ink);border-bottom:0}.repo-subtitle{color:var(--muted);font-size:12px;margin-top:2px}.badge{border-radius:999px;background:#eef2f7;color:var(--muted);font-size:11px;font-weight:800;padding:4px 9px;white-space:nowrap}.completed .badge{background:#dcfce7;color:var(--good)}.active .badge{background:#dbeafe;color:var(--blue)}
+.count-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.count-row span{background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:8px;font-size:12px;color:var(--muted)}.count-row b{display:block;color:var(--ink);font-size:19px;line-height:1.05}
+.card-actions{display:flex;gap:8px;margin-bottom:10px}.card-actions a{background:#f8fafc;border:1px solid #dbe3ed;border-radius:7px;padding:6px 10px;font-size:12px;font-weight:750;color:var(--ink)}
 details{border-top:1px solid var(--line);padding-top:9px}summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:700}h3{font-size:11px;margin:12px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}ul{margin:0;padding-left:18px}li{margin:5px 0;font-size:13px;overflow-wrap:anywhere}li span{color:var(--muted)}.muted{color:var(--muted)}.empty-lane{border:1px dashed #cfc5b5;border-radius:8px;color:var(--muted);padding:18px;text-align:center;background:rgba(255,255,255,.48);font-size:13px;font-weight:700}
 @media(max-width:860px){main{padding:22px 14px 44px}.page-header{display:block;padding-top:12px}h1{font-size:30px}.meta{display:inline-block;margin-top:12px;white-space:normal}.summary{padding:18px}.board{grid-template-columns:1fr;min-width:0}.board-wrap{overflow-x:visible}}
 </style>
@@ -256,7 +255,6 @@ details{border-top:1px solid var(--line);padding-top:9px}summary{cursor:pointer;
 <main>
 <header class="page-header">
   <div>
-    <div class="kicker">Repo Intelligence</div>
     <h1>Boundex Repo Intelligence</h1>
   </div>
   <div class="meta">Updated $NOW_HUMAN</div>
