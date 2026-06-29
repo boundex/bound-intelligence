@@ -225,8 +225,7 @@ a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(183,63,5
 main{max-width:1440px;margin:0 auto;padding:32px 24px 56px}
 header{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:18px}
 h1{margin:0;font-size:32px;line-height:1.05;letter-spacing:0}.meta{color:var(--muted);font-size:14px}.status{color:var(--good);font-weight:650}
-.topbar{display:grid;grid-template-columns:minmax(280px,1fr) minmax(360px,1.6fr);gap:16px;align-items:stretch;margin-bottom:18px}
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px}.stat b{display:block;font-size:26px;line-height:1}.stat span{color:var(--muted);font-size:13px}
+.topbar{margin-bottom:18px}
 .summary{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;padding:18px}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}.summary p{margin:0;font-size:14px}
 .board-wrap{overflow-x:auto;padding-bottom:12px}.board{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:16px;min-width:980px}
 .lane{background:var(--lane);border:1px solid var(--line);border-radius:8px;padding:12px;min-height:360px}.lane header{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px}.lane h2{margin:0;font-size:15px}.lane-count{color:var(--muted);font-size:12px}
@@ -237,7 +236,7 @@ h1{margin:0;font-size:32px;line-height:1.05;letter-spacing:0}.meta{color:var(--m
 details{border-top:1px solid var(--line);padding-top:8px}summary{cursor:pointer;color:var(--muted);font-size:13px}h3{font-size:11px;margin:12px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}ul{margin:0;padding-left:18px}li{margin:5px 0;font-size:13px;overflow-wrap:anywhere}li span{color:var(--muted)}.muted{color:var(--muted)}.empty-lane{border:1px dashed #cfc5b5;border-radius:8px;color:var(--muted);padding:16px;text-align:center;background:rgba(255,255,255,.35);font-size:13px}
 .reference{margin-top:20px}.reference table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}.reference th,.reference td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}.reference th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:#f3efe6}.reference tr:last-child td{border-bottom:0}
 footer{margin-top:24px;color:var(--muted);font-size:12px}
-@media(max-width:860px){main{padding:24px 14px 48px}header{display:block}h1{font-size:28px}.topbar{grid-template-columns:1fr}.board{grid-template-columns:1fr;min-width:0}.board-wrap{overflow-x:visible}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:860px){main{padding:24px 14px 48px}header{display:block}h1{font-size:28px}.board{grid-template-columns:1fr;min-width:0}.board-wrap{overflow-x:visible}}
 </style>
 </head>
 <body>
@@ -245,19 +244,12 @@ footer{margin-top:24px;color:var(--muted);font-size:12px}
 <header>
   <div>
     <h1>Boundex Repo Intelligence</h1>
-    <div class="meta">Window: $LAST_RUN_DATE to $TODAY · Updated $NOW_HUMAN</div>
   </div>
-  <div class="meta"><span class="status">$SYNC_STATUS</span></div>
+  <div class="meta"><span class="status">$SYNC_STATUS</span> · Updated $NOW_HUMAN</div>
 </header>
 <section class="topbar">
-  <div class="stats">
-    <div class="stat"><b>$REPO_COUNT</b><span>Tracked repos</span></div>
-    <div class="stat"><b>$ACTIVE_COUNT</b><span>Active repos</span></div>
-    <div class="stat"><b>$TOTAL_PRS</b><span>Merged PRs</span></div>
-    <div class="stat"><b>$TOTAL_RELEASES</b><span>Releases</span></div>
-  </div>
   <div class="summary">
-    <h2>Plain-English Summary</h2>
+    <h2>$TODAY Daily Summary</h2>
     $SUMMARY_HTML
   </div>
 </section>
