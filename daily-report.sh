@@ -245,7 +245,7 @@ footer{margin-top:24px;color:var(--muted);font-size:12px}
   <div>
     <h1>Boundex Repo Intelligence</h1>
   </div>
-  <div class="meta"><span class="status">$SYNC_STATUS</span> · Updated $NOW_HUMAN</div>
+  <div class="meta">Updated $NOW_HUMAN</div>
 </header>
 <section class="topbar">
   <div class="summary">
