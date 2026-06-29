@@ -105,8 +105,8 @@ TOTAL_PRS=0
 TOTAL_COMMITS=0
 TABLE_ROWS=""
 DETAIL_BLOCKS=""
-BOARD_SHIPPED=""
-BOARD_IN_MOTION=""
+BOARD_COMPLETED=""
+BOARD_IN_PROGRESS=""
 BOARD_QUIET=""
 RAW_DATA=""
 
@@ -158,21 +158,21 @@ for entry in "${REPOS[@]}"; do
   CARD_STATUS="Quiet"
   CARD_CLASS="quiet"
   CARD_BADGE="No activity"
-  if [ "$release_count" -gt 0 ]; then
-    CARD_STATUS="Shipped"
-    CARD_CLASS="shipped"
-    CARD_BADGE="Release"
-  elif [ "$pr_count" -gt 0 ] || [ "$commit_count" -gt 0 ]; then
-    CARD_STATUS="In motion"
+  if [ "$pr_count" -gt 0 ]; then
+    CARD_STATUS="Completed"
+    CARD_CLASS="completed"
+    CARD_BADGE="Merged"
+  elif [ "$commit_count" -gt 0 ]; then
+    CARD_STATUS="In Progress"
     CARD_CLASS="active"
-    CARD_BADGE="Changed"
+    CARD_BADGE="Commits"
   fi
 
   CARD_HTML="<article class=\"repo-card $CARD_CLASS\"><div class=\"card-top\"><div><a class=\"repo-name\" href=\"$repo_url\">$safe_name</a><div class=\"repo-subtitle\">$CARD_STATUS in this window</div></div><span class=\"badge\">$CARD_BADGE</span></div><div class=\"count-row\"><span><b>$release_count</b> releases</span><span><b>$pr_count</b> PRs</span><span><b>$commit_count</b> commits</span></div><div class=\"card-actions\"><a href=\"$pr_url\">Merged PRs</a><a href=\"$repo_url\">Repo</a></div><details><summary>Details</summary><div class=\"detail-stack\"><section><h3>Releases</h3><ul>$release_items</ul></section><section><h3>Merged PRs</h3><ul>$pr_items</ul></section><section><h3>Commits</h3><ul>$commit_items</ul></section></div></details></article>"$'\n'
-  if [ "$release_count" -gt 0 ]; then
-    BOARD_SHIPPED+="$CARD_HTML"
-  elif [ "$pr_count" -gt 0 ] || [ "$commit_count" -gt 0 ]; then
-    BOARD_IN_MOTION+="$CARD_HTML"
+  if [ "$pr_count" -gt 0 ]; then
+    BOARD_COMPLETED+="$CARD_HTML"
+  elif [ "$commit_count" -gt 0 ]; then
+    BOARD_IN_PROGRESS+="$CARD_HTML"
   else
     BOARD_QUIET+="$CARD_HTML"
   fi
@@ -183,8 +183,8 @@ for entry in "${REPOS[@]}"; do
   [ "$commit_count" -gt 0 ] && RAW_DATA+="Commits:"$'\n'"$commits"$'\n'
 done
 
-[ -z "$BOARD_SHIPPED" ] && BOARD_SHIPPED="<div class=\"empty-lane\">No releases in this window.</div>"
-[ -z "$BOARD_IN_MOTION" ] && BOARD_IN_MOTION="<div class=\"empty-lane\">No merged PRs or commits in this window.</div>"
+[ -z "$BOARD_COMPLETED" ] && BOARD_COMPLETED="<div class=\"empty-lane\">No merged PRs in this window.</div>"
+[ -z "$BOARD_IN_PROGRESS" ] && BOARD_IN_PROGRESS="<div class=\"empty-lane\">No commits without merged PRs in this window.</div>"
 [ -z "$BOARD_QUIET" ] && BOARD_QUIET="<div class=\"empty-lane\">No quiet repos.</div>"
 
 SUMMARY_HTML="<p class=\"muted\">Install an LLM CLI such as Claude to generate the plain-English narrative. The activity data below is still live from GitHub and the local mirrors.</p>"
@@ -229,8 +229,8 @@ h1{margin:0;font-size:32px;line-height:1.05;letter-spacing:0}.meta{color:var(--m
 .summary{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;padding:18px}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}.summary p{margin:0;font-size:14px}
 .board-wrap{overflow-x:auto;padding-bottom:12px}.board{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:16px;min-width:980px}
 .lane{background:var(--lane);border:1px solid var(--line);border-radius:8px;padding:12px;min-height:360px}.lane header{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px}.lane h2{margin:0;font-size:15px}.lane-count{color:var(--muted);font-size:12px}
-.repo-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:12px;box-shadow:0 1px 0 rgba(41,39,36,.06)}.repo-card.shipped{border-top:4px solid var(--good)}.repo-card.active{border-top:4px solid var(--blue)}.repo-card.quiet{border-top:4px solid #aaa093}
-.card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.repo-name{font-weight:750;color:var(--ink);border-bottom:0}.repo-subtitle{color:var(--muted);font-size:12px;margin-top:2px}.badge{border-radius:999px;background:#f0ece4;color:var(--muted);font-size:11px;font-weight:700;padding:3px 8px;white-space:nowrap}.shipped .badge{background:#dff2eb;color:var(--good)}.active .badge{background:#e1edf5;color:var(--blue)}
+.repo-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:12px;box-shadow:0 1px 0 rgba(41,39,36,.06)}.repo-card.completed{border-top:4px solid var(--good)}.repo-card.active{border-top:4px solid var(--blue)}.repo-card.quiet{border-top:4px solid #aaa093}
+.card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.repo-name{font-weight:750;color:var(--ink);border-bottom:0}.repo-subtitle{color:var(--muted);font-size:12px;margin-top:2px}.badge{border-radius:999px;background:#f0ece4;color:var(--muted);font-size:11px;font-weight:700;padding:3px 8px;white-space:nowrap}.completed .badge{background:#dff2eb;color:var(--good)}.active .badge{background:#e1edf5;color:var(--blue)}
 .count-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.count-row span{background:#f5f1e8;border:1px solid #e7dfd0;border-radius:7px;padding:8px;font-size:12px;color:var(--muted)}.count-row b{display:block;color:var(--ink);font-size:18px}
 .card-actions{display:flex;gap:8px;margin-bottom:10px}.card-actions a{background:#f5f1e8;border:1px solid #e7dfd0;border-radius:7px;padding:6px 9px;font-size:12px;color:var(--ink)}
 details{border-top:1px solid var(--line);padding-top:8px}summary{cursor:pointer;color:var(--muted);font-size:13px}h3{font-size:11px;margin:12px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}ul{margin:0;padding-left:18px}li{margin:5px 0;font-size:13px;overflow-wrap:anywhere}li span{color:var(--muted)}.muted{color:var(--muted)}.empty-lane{border:1px dashed #cfc5b5;border-radius:8px;color:var(--muted);padding:16px;text-align:center;background:rgba(255,255,255,.35);font-size:13px}
@@ -258,12 +258,12 @@ footer{margin-top:24px;color:var(--muted);font-size:12px}
   <div class="board-wrap">
     <div class="board">
       <section class="lane">
-        <header><h2>Shipped</h2><span class="lane-count">Releases</span></header>
-        $BOARD_SHIPPED
+        <header><h2>Completed</h2><span class="lane-count">Merged PRs</span></header>
+        $BOARD_COMPLETED
       </section>
       <section class="lane">
-        <header><h2>In motion</h2><span class="lane-count">PRs & commits</span></header>
-        $BOARD_IN_MOTION
+        <header><h2>In Progress</h2><span class="lane-count">Commits</span></header>
+        $BOARD_IN_PROGRESS
       </section>
       <section class="lane">
         <header><h2>Quiet</h2><span class="lane-count">No activity</span></header>

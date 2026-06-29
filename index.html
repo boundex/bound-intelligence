@@ -15,8 +15,8 @@ h1{margin:0;font-size:32px;line-height:1.05;letter-spacing:0}.meta{color:var(--m
 .summary{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;padding:18px}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}.summary p{margin:0;font-size:14px}
 .board-wrap{overflow-x:auto;padding-bottom:12px}.board{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:16px;min-width:980px}
 .lane{background:var(--lane);border:1px solid var(--line);border-radius:8px;padding:12px;min-height:360px}.lane header{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px}.lane h2{margin:0;font-size:15px}.lane-count{color:var(--muted);font-size:12px}
-.repo-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:12px;box-shadow:0 1px 0 rgba(41,39,36,.06)}.repo-card.shipped{border-top:4px solid var(--good)}.repo-card.active{border-top:4px solid var(--blue)}.repo-card.quiet{border-top:4px solid #aaa093}
-.card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.repo-name{font-weight:750;color:var(--ink);border-bottom:0}.repo-subtitle{color:var(--muted);font-size:12px;margin-top:2px}.badge{border-radius:999px;background:#f0ece4;color:var(--muted);font-size:11px;font-weight:700;padding:3px 8px;white-space:nowrap}.shipped .badge{background:#dff2eb;color:var(--good)}.active .badge{background:#e1edf5;color:var(--blue)}
+.repo-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:12px;box-shadow:0 1px 0 rgba(41,39,36,.06)}.repo-card.completed{border-top:4px solid var(--good)}.repo-card.active{border-top:4px solid var(--blue)}.repo-card.quiet{border-top:4px solid #aaa093}
+.card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.repo-name{font-weight:750;color:var(--ink);border-bottom:0}.repo-subtitle{color:var(--muted);font-size:12px;margin-top:2px}.badge{border-radius:999px;background:#f0ece4;color:var(--muted);font-size:11px;font-weight:700;padding:3px 8px;white-space:nowrap}.completed .badge{background:#dff2eb;color:var(--good)}.active .badge{background:#e1edf5;color:var(--blue)}
 .count-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.count-row span{background:#f5f1e8;border:1px solid #e7dfd0;border-radius:7px;padding:8px;font-size:12px;color:var(--muted)}.count-row b{display:block;color:var(--ink);font-size:18px}
 .card-actions{display:flex;gap:8px;margin-bottom:10px}.card-actions a{background:#f5f1e8;border:1px solid #e7dfd0;border-radius:7px;padding:6px 9px;font-size:12px;color:var(--ink)}
 details{border-top:1px solid var(--line);padding-top:8px}summary{cursor:pointer;color:var(--muted);font-size:13px}h3{font-size:11px;margin:12px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}ul{margin:0;padding-left:18px}li{margin:5px 0;font-size:13px;overflow-wrap:anywhere}li span{color:var(--muted)}.muted{color:var(--muted)}.empty-lane{border:1px dashed #cfc5b5;border-radius:8px;color:var(--muted);padding:16px;text-align:center;background:rgba(255,255,255,.35);font-size:13px}
@@ -31,12 +31,12 @@ footer{margin-top:24px;color:var(--muted);font-size:12px}
   <div>
     <h1>Boundex Repo Intelligence</h1>
   </div>
-  <div class="meta">Updated 2026-06-29 20:06:55 CST</div>
+  <div class="meta">Updated 2026-06-29 20:15:41 CST</div>
 </header>
 <section class="topbar">
   <div class="summary">
     <h2>2026-06-29 Daily Summary</h2>
-    <p>Boundex engineering was quiet during the reporting window from 2026-06-29 12:04:09 UTC to 12:06:55 UTC.<br><br>Across all 8 tracked repositories, there were no releases, merged pull requests, or commits recorded. This includes radfi-web, ordinal-provider, ord-indexer, bound_lending, bound_lending_solver, bound_marketing_mcp, bound-dashboard, and docs_bound_exchange.<br><br>No concrete shipped work, fixes, or notable engineering movement appeared in the source data for this interval.</p>
+    <p>Boundex engineering was quiet during the 2026-06-29 12:06:55Z to 12:15:41Z window.<br><br>Across all 8 tracked repositories, there were no releases, merged PRs, or commits recorded. This includes radfi-web, ordinal-provider, ord-indexer, bound_lending, bound_lending_solver, bound_marketing_mcp, bound-dashboard, and docs_bound_exchange.<br><br>No concrete shipped work, fixes, or notable engineering movement was present in the supplied data for this reporting period.</p>
   </div>
 </section>
 <section>
@@ -44,12 +44,12 @@ footer{margin-top:24px;color:var(--muted);font-size:12px}
   <div class="board-wrap">
     <div class="board">
       <section class="lane">
-        <header><h2>Shipped</h2><span class="lane-count">Releases</span></header>
-        <div class="empty-lane">No releases in this window.</div>
+        <header><h2>Completed</h2><span class="lane-count">Merged PRs</span></header>
+        <div class="empty-lane">No merged PRs in this window.</div>
       </section>
       <section class="lane">
-        <header><h2>In motion</h2><span class="lane-count">PRs & commits</span></header>
-        <div class="empty-lane">No merged PRs or commits in this window.</div>
+        <header><h2>In Progress</h2><span class="lane-count">Commits</span></header>
+        <div class="empty-lane">No commits without merged PRs in this window.</div>
       </section>
       <section class="lane">
         <header><h2>Quiet</h2><span class="lane-count">No activity</span></header>
