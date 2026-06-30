@@ -69,6 +69,27 @@ mkdir -p "$WORKSPACE/daily-reports" "$HISTORY_DIR"
 timestamp() { date "+%Y-%m-%d %H:%M:%S"; }
 html_escape() { jq -Rr @html; }
 
+format_summary_text() {
+  SUMMARY_INPUT="$1" REPORT_DATE="$TODAY" CURRENT_DAY="$CURRENT_DAY" REPO_NAMES="$REPO_NAMES" python3 - <<'PY'
+import os
+import re
+
+text = os.environ["SUMMARY_INPUT"]
+report_date = os.environ["REPORT_DATE"]
+current_day = os.environ["CURRENT_DAY"]
+repo_names = [name for name in os.environ["REPO_NAMES"].splitlines() if name]
+
+if report_date != current_day:
+    for zone in ("EDT", "EST"):
+        text = text.replace(f"{report_date} 00:00:00 {zone} to {report_date} 23:59:59 {zone}", report_date)
+
+for name in sorted(repo_names, key=len, reverse=True):
+    text = re.sub(rf"(?<![`\\w-]){re.escape(name)}(?![`\\w-])", f"`{name}`", text)
+
+print(text)
+PY
+}
+
 iso_to_display_time() {
   local iso="$1"
   local epoch
@@ -148,6 +169,12 @@ LAST_RUN="$DAY_START_ISO"
 LAST_RUN_DATE=${LAST_RUN%%T*}
 LAST_RUN_HUMAN=$(iso_to_display_time "$LAST_RUN")
 REPO_COUNT="${#REPOS[@]}"
+REPO_NAMES=$(printf '%s\n' "${REPOS[@]##*/}")
+if [ "$TODAY" = "$CURRENT_DAY" ]; then
+  REPORT_WINDOW_LABEL="$LAST_RUN_HUMAN to $NOW_HUMAN"
+else
+  REPORT_WINDOW_LABEL="$TODAY"
+fi
 
 ACTIVE_COUNT=0
 TOTAL_RELEASES=0
@@ -248,7 +275,7 @@ if [ ! -x "$CODEX_BIN" ] && command -v codex >/dev/null 2>&1; then
 fi
 
 if [ -x "$CODEX_BIN" ]; then
-  PROMPT="Write a concise daily development summary for Boundex covering $LAST_RUN_HUMAN to $NOW_HUMAN across $REPO_COUNT repos. Use Eastern Time when referring to the reporting window. Use plain text only: no Markdown headings, bold markers, bullets, or tables. Keep it easy to scan in one or two short paragraphs. Do not list every PR. Summarize concrete shipped work, fixes, and notable development movement. Mention quiet repos briefly. Do not invent details. Source data:
+  PROMPT="Write a concise daily development summary for Boundex covering $REPORT_WINDOW_LABEL across $REPO_COUNT repos. Use Eastern Time when referring to the reporting window. If the window is a complete day, refer to it by date only. Use plain text only: no Markdown headings, bold markers, bullets, or tables. Wrap repository names in backticks, for example \`bound_marketing_mcp\`. Keep it easy to scan in one or two short paragraphs. Do not list every PR. Summarize concrete shipped work, fixes, and notable development movement. Mention quiet repos briefly. Do not invent details. Source data:
 $RAW_DATA"
   SUMMARY_FILE=$(mktemp "$WORKSPACE/.codex-summary.XXXXXX")
   SUMMARY=""
@@ -259,11 +286,12 @@ $RAW_DATA"
   fi
   rm -f "$SUMMARY_FILE"
   if [ -n "$SUMMARY" ]; then
-    SUMMARY_ESCAPED=$(printf '%s' "$SUMMARY" | sed '/^[[:space:]]*$/d' | html_escape | awk 'BEGIN{first=1} {if (!first) printf "<br>"; printf "%s", $0; first=0}')
+    SUMMARY=$(format_summary_text "$SUMMARY")
+    SUMMARY_ESCAPED=$(printf '%s' "$SUMMARY" | sed '/^[[:space:]]*$/d' | html_escape | sed -E 's#`([^`]+)`#<code>\1</code>#g' | awk 'BEGIN{first=1} {if (!first) printf "<br>"; printf "%s", $0; first=0}')
     SUMMARY_HTML="<p>$SUMMARY_ESCAPED</p>"
   fi
 else
-  PROMPT="Write a concise daily development summary for Boundex covering $LAST_RUN_HUMAN to $NOW_HUMAN across $REPO_COUNT repos. Use Eastern Time when referring to the reporting window. Use plain text only: no Markdown headings, bold markers, bullets, or tables. Keep it easy to scan in one or two short paragraphs. Do not list every PR. Summarize concrete shipped work, fixes, and notable development movement. Mention quiet repos briefly. Do not invent details. Source data:
+  PROMPT="Write a concise daily development summary for Boundex covering $REPORT_WINDOW_LABEL across $REPO_COUNT repos. Use Eastern Time when referring to the reporting window. If the window is a complete day, refer to it by date only. Use plain text only: no Markdown headings, bold markers, bullets, or tables. Wrap repository names in backticks, for example \`bound_marketing_mcp\`. Keep it easy to scan in one or two short paragraphs. Do not list every PR. Summarize concrete shipped work, fixes, and notable development movement. Mention quiet repos briefly. Do not invent details. Source data:
 $RAW_DATA"
   SUMMARY_FILE=$(mktemp "$WORKSPACE/.openai-summary.XXXXXX")
   PROMPT_FILE=$(mktemp "$WORKSPACE/.openai-prompt.XXXXXX")
@@ -293,7 +321,8 @@ PY
   fi
   rm -f "$SUMMARY_FILE" "$PROMPT_FILE"
   if [ -n "$SUMMARY" ]; then
-    SUMMARY_ESCAPED=$(printf '%s' "$SUMMARY" | sed '/^[[:space:]]*$/d' | html_escape | awk 'BEGIN{first=1} {if (!first) printf "<br>"; printf "%s", $0; first=0}')
+    SUMMARY=$(format_summary_text "$SUMMARY")
+    SUMMARY_ESCAPED=$(printf '%s' "$SUMMARY" | sed '/^[[:space:]]*$/d' | html_escape | sed -E 's#`([^`]+)`#<code>\1</code>#g' | awk 'BEGIN{first=1} {if (!first) printf "<br>"; printf "%s", $0; first=0}')
     SUMMARY_HTML="<p>$SUMMARY_ESCAPED</p>"
   else
     SUMMARY_HTML="<p class=\"muted\">AI summary was not available for this run. The repo board below is still live from GitHub and the local mirrors.</p>"
@@ -374,7 +403,7 @@ main{max-width:1440px;margin:0 auto;padding:28px 24px 56px}
 .page-header{display:flex;justify-content:space-between;gap:24px;align-items:center;margin-bottom:14px;padding:4px 2px 2px}.brand{display:flex;align-items:center;gap:10px}.brand-logo{width:30px;height:30px;object-fit:contain;display:block}
 h1{margin:0;font-size:20px;line-height:1.15;letter-spacing:0;font-weight:500}.meta{color:var(--muted);font-size:13px;white-space:nowrap}
 .topbar{margin-bottom:22px}
-.summary{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:22px 24px;box-shadow:var(--shadow-1);position:relative}.summary:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--primary);border-radius:8px 0 0 8px}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:700}.summary p{margin:0;font-size:15px;max-width:112ch}
+.summary{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:22px 24px;box-shadow:var(--shadow-1);position:relative}.summary:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--primary);border-radius:8px 0 0 8px}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:700}.summary p{margin:0;font-size:15px;max-width:112ch}.summary code{background:#fff3e0;border:1px solid #ffd7a3;border-radius:5px;color:var(--primary-dark);font-family:"Roboto Mono","SFMono-Regular",Consolas,monospace;font-size:.9em;padding:1px 5px}
 .summary-pagination{display:flex;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0 0}.summary-pagination button{appearance:none;border:1px solid var(--outline-soft);background:transparent;color:var(--muted);border-radius:8px;padding:7px 11px;font:inherit;font-size:12px;font-weight:500;line-height:1;cursor:pointer}.summary-pagination button:hover{border-color:#ffd7a3;color:var(--primary-dark);background:rgba(255,243,224,.5)}.summary-pagination button.active{background:#fff3e0;border-color:#ffd7a3;color:var(--primary-dark)}.summary-pagination button:disabled{cursor:not-allowed;opacity:.45;background:transparent}
 .board-wrap{overflow-x:auto;padding:2px 2px 14px}.board{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:18px;min-width:980px}
 .lane{background:var(--surface-variant);border:1px solid var(--outline-soft);border-radius:8px;padding:14px;min-height:380px}.lane header{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px;padding:0 2px 10px;border-bottom:1px solid var(--outline)}.lane h2{margin:0;font-size:16px;font-weight:500}.lane-count{color:var(--muted);font-size:12px;font-weight:500}
