@@ -136,14 +136,19 @@ for entry in "${REPOS[@]}"; do
   repo_path="$REPOS_DIR/$name"
   echo "Processing $name ($repo_full)..." >> "$LOG_FILE"
 
+  if ! gh repo view "$repo_full" --json name >/dev/null 2>> "$LOG_FILE"; then
+    echo "ERROR: cannot access $repo_full. Check BOUND_REPO_TOKEN/GH_TOKEN permissions." >> "$LOG_FILE"
+    exit 1
+  fi
+
   releases=$(gh release list --repo "$repo_full" --limit 30 --json tagName,publishedAt,name 2>/dev/null \
-    | jq --arg since "$LAST_RUN" '[.[] | select(.publishedAt >= $since)]' || echo "[]")
-  release_count=$(echo "$releases" | jq 'length')
+    | jq --arg since "$LAST_RUN" '[.[] | select(.publishedAt >= $since)]' 2>/dev/null || echo "[]")
+  release_count=$(echo "$releases" | jq 'length' 2>/dev/null || echo "0")
 
   prs=$(gh pr list --repo "$repo_full" \
     --search "is:pr is:merged merged:>=$LAST_RUN_DATE" \
     --json number,title,author,mergedAt,url --limit 100 2>/dev/null || echo "[]")
-  pr_count=$(echo "$prs" | jq 'length')
+  pr_count=$(echo "$prs" | jq 'length' 2>/dev/null || echo "0")
 
   commits=""
   if [ -d "$repo_path/.git" ]; then
