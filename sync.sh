@@ -3,7 +3,7 @@
 
 set -u
 
-WORKSPACE="/Users/2infiniti/Desktop/dev/bound-intelligence"
+WORKSPACE="${WORKSPACE:-/Users/2infiniti/Desktop/dev/bound-intelligence}"
 REPOS_DIR="$WORKSPACE/repos"
 LOG_FILE="$WORKSPACE/.sync.log"
 GITHUB_ORG="boundex"

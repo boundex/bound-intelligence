@@ -3,7 +3,7 @@
 
 set -u
 
-WORKSPACE="/Users/2infiniti/Desktop/dev/bound-intelligence"
+WORKSPACE="${WORKSPACE:-/Users/2infiniti/Desktop/dev/bound-intelligence}"
 REPOS_DIR="$WORKSPACE/repos"
 GITHUB_ORG="boundex"
 STATE_FILE="$WORKSPACE/.daily-state.json"
@@ -88,7 +88,7 @@ code{background:#f0ece4;padding:2px 6px;border-radius:5px}
 <h1>Boundex Repo Intelligence</h1>
 <div class="notice">
 <p><strong>Setup needed:</strong> this report needs <code>gh</code>, <code>git</code>, and <code>jq</code>.</p>
-<p>Install GitHub CLI, run <code>gh auth login</code>, then run <code>/Users/2infiniti/Desktop/dev/bound-intelligence/daily-report.sh</code> again.</p>
+<p>Install GitHub CLI, run <code>gh auth login</code>, then run <code>$WORKSPACE/daily-report.sh</code> again.</p>
 </div>
 </main></body></html>
 HTML
@@ -222,7 +222,41 @@ $RAW_DATA"
     SUMMARY_HTML="<p>$SUMMARY_ESCAPED</p>"
   fi
 else
-  SUMMARY_HTML="<p class=\"muted\">Codex CLI was not found. The activity data below is still live from GitHub and the local mirrors.</p>"
+  PROMPT="Write a concise daily executive engineering digest for Boundex covering $LAST_RUN_HUMAN to $NOW_HUMAN across $REPO_COUNT repos. The audience is business planning and external communications. Use Eastern Time when referring to the reporting window. Use plain text only: no Markdown headings, bold markers, bullets, or tables. Do not list every PR. Summarize concrete shipped work, fixes, and notable movement. Mention quiet repos briefly. Do not invent details. Source data:
+$RAW_DATA"
+  SUMMARY_FILE=$(mktemp "$WORKSPACE/.openai-summary.XXXXXX")
+  PROMPT_FILE=$(mktemp "$WORKSPACE/.openai-prompt.XXXXXX")
+  printf '%s' "$PROMPT" > "$PROMPT_FILE"
+  SUMMARY=""
+  if [ -n "${OPENAI_API_KEY:-}" ] && python3 -c "import openai" >/dev/null 2>&1; then
+    if PROMPT_FILE="$PROMPT_FILE" SUMMARY_FILE="$SUMMARY_FILE" python3 - <<'PY' >> "$LOG_FILE" 2>&1
+import os
+from pathlib import Path
+from openai import OpenAI
+
+prompt = Path(os.environ["PROMPT_FILE"]).read_text()
+client = OpenAI()
+response = client.responses.create(
+    model=os.environ.get("OPENAI_MODEL", "gpt-5.5"),
+    input=prompt,
+)
+Path(os.environ["SUMMARY_FILE"]).write_text(response.output_text.strip())
+PY
+    then
+      SUMMARY=$(cat "$SUMMARY_FILE")
+    else
+      echo "OpenAI summary generation failed; report will keep the activity cards." >> "$LOG_FILE"
+    fi
+  else
+    echo "No Codex CLI or OPENAI_API_KEY/openai package available; report will keep the activity cards." >> "$LOG_FILE"
+  fi
+  rm -f "$SUMMARY_FILE" "$PROMPT_FILE"
+  if [ -n "$SUMMARY" ]; then
+    SUMMARY_ESCAPED=$(printf '%s' "$SUMMARY" | html_escape | awk 'BEGIN{first=1} {if (!first) printf "<br>"; printf "%s", $0; first=0}')
+    SUMMARY_HTML="<p>$SUMMARY_ESCAPED</p>"
+  else
+    SUMMARY_HTML="<p class=\"muted\">AI summary was not available for this run. The repo board below is still live from GitHub and the local mirrors.</p>"
+  fi
 fi
 
 cat > "$REPORT.tmp" <<HTML
