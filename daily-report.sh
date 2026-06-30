@@ -15,6 +15,14 @@ DISPLAY_TZ="America/New_York"
 TODAY=$(TZ="$DISPLAY_TZ" date "+%Y-%m-%d")
 NOW_HUMAN=$(TZ="$DISPLAY_TZ" date "+%Y-%m-%d %H:%M:%S %Z")
 NOW_ISO=$(date -u "+%Y-%m-%dT%H:%M:%SZ")
+DAY_START_ISO=$(python3 - <<PY
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+tz = ZoneInfo("$DISPLAY_TZ")
+start = datetime.now(tz).replace(hour=0, minute=0, second=0, microsecond=0)
+print(start.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
+PY
+)
 
 REPOS=(
   "radfi-web"
@@ -107,11 +115,7 @@ else
   SYNC_STATUS="Sync script is not executable."
 fi
 
-if [ -f "$STATE_FILE" ]; then
-  LAST_RUN=$(jq -r '.last_run' "$STATE_FILE")
-else
-  LAST_RUN=$(date -u -v-1d "+%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -u -d '1 day ago' "+%Y-%m-%dT%H:%M:%SZ")
-fi
+LAST_RUN="$DAY_START_ISO"
 LAST_RUN_DATE=${LAST_RUN%%T*}
 LAST_RUN_HUMAN=$(iso_to_display_time "$LAST_RUN")
 REPO_COUNT="${#REPOS[@]}"
@@ -325,6 +329,6 @@ HTML
 
 mv "$REPORT.tmp" "$REPORT"
 cp "$REPORT" "$WORKSPACE/daily-reports/$TODAY.html"
-echo "{\"last_run\": \"$NOW_ISO\"}" > "$STATE_FILE"
+echo "{\"last_run\": \"$NOW_ISO\", \"window_start\": \"$LAST_RUN\", \"mode\": \"daily-window\"}" > "$STATE_FILE"
 echo "Daily report completed at $(timestamp): $REPORT" >> "$LOG_FILE"
 echo "========================================" >> "$LOG_FILE"
