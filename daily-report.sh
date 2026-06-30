@@ -273,33 +273,8 @@ PY
 fi
 
 HISTORY_REPORT="$HISTORY_DIR/$TODAY.html"
-SUMMARY_TABS="<button type=\"button\" class=\"summary-tab active\" data-summary-date=\"$TODAY\">$TODAY</button>"
-SUMMARY_TEMPLATES="<template id=\"summary-template-$TODAY\">$SUMMARY_HTML</template>"
-if ls "$HISTORY_DIR"/*.html >/dev/null 2>&1; then
-  while IFS= read -r history_file; do
-    history_date=$(basename "$history_file" .html)
-    [ "$history_date" = "$TODAY" ] && continue
-    history_summary=$(python3 - "$history_file" <<'PY'
-from pathlib import Path
-import re
-import sys
-
-html = Path(sys.argv[1]).read_text(errors="ignore")
-content = ""
-match = re.search(r'<div id="summary-content">\s*(.*?)\s*</div>\s*<div class="summary-tabs"', html, re.S)
-if match:
-    content = match.group(1).strip()
-else:
-    match = re.search(r'<div class="summary">\s*<h2>.*?</h2>\s*(.*?)\s*</div>\s*</section>', html, re.S)
-    if match:
-        content = match.group(1).strip()
-print(content or '<p class="muted">No archived summary available.</p>')
-PY
-)
-    SUMMARY_TABS+="<button type=\"button\" class=\"summary-tab\" data-summary-date=\"$history_date\">$history_date</button>"
-    SUMMARY_TEMPLATES+="<template id=\"summary-template-$history_date\">$history_summary</template>"
-  done < <(find "$HISTORY_DIR" -maxdepth 1 -name '*.html' -print | sort -r | head -14)
-fi
+TODAY_SHORT=$(TZ="$DISPLAY_TZ" date "+%-m/%-d")
+DUMMY_PAGINATION="<button type=\"button\" class=\"page-step\" disabled>Previous</button><button type=\"button\" class=\"page-number\">6/28</button><button type=\"button\" class=\"page-number\">6/29</button><button type=\"button\" class=\"page-number active\">$TODAY_SHORT</button><button type=\"button\" class=\"page-step\">Next</button>"
 
 cat > "$REPORT.tmp" <<HTML
 <!doctype html>
@@ -317,7 +292,7 @@ main{max-width:1440px;margin:0 auto;padding:28px 24px 56px}
 h1{margin:0;font-size:20px;line-height:1.15;letter-spacing:0;font-weight:500}.meta{color:var(--muted);font-size:13px;white-space:nowrap}
 .topbar{margin-bottom:22px}
 .summary{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:22px 24px;box-shadow:var(--shadow-1);position:relative}.summary:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--primary);border-radius:8px 0 0 8px}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:700}.summary p{margin:0;font-size:15px;max-width:112ch}
-.summary-tabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0 0}.summary-tab{appearance:none;border:1px solid var(--outline-soft);background:var(--surface);color:var(--muted);border-radius:999px;padding:6px 11px;font:inherit;font-size:12px;font-weight:500;cursor:pointer}.summary-tab:hover{border-color:#ffd7a3;color:var(--primary-dark)}.summary-tab.active{background:#fff3e0;border-color:#ffd7a3;color:var(--primary-dark)}.summary-templates{display:none}
+.summary-pagination{display:flex;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0 0}.summary-pagination button{appearance:none;border:1px solid var(--outline-soft);background:transparent;color:var(--muted);border-radius:8px;padding:7px 11px;font:inherit;font-size:12px;font-weight:500;line-height:1;cursor:pointer}.summary-pagination button:hover{border-color:#ffd7a3;color:var(--primary-dark);background:rgba(255,243,224,.5)}.summary-pagination button.active{background:#fff3e0;border-color:#ffd7a3;color:var(--primary-dark)}.summary-pagination button:disabled{cursor:not-allowed;opacity:.45;background:transparent}
 .board-wrap{overflow-x:auto;padding:2px 2px 14px}.board{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:18px;min-width:980px}
 .lane{background:var(--surface-variant);border:1px solid var(--outline-soft);border-radius:8px;padding:14px;min-height:380px}.lane header{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px;padding:0 2px 10px;border-bottom:1px solid var(--outline)}.lane h2{margin:0;font-size:16px;font-weight:500}.lane-count{color:var(--muted);font-size:12px;font-weight:500}
 .repo-card{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:15px;margin-bottom:12px;box-shadow:var(--shadow-1);transition:box-shadow .15s ease,transform .15s ease}.repo-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-2)}.repo-card.completed{border-left:4px solid var(--success)}.repo-card.active{border-left:4px solid var(--progress)}.repo-card.quiet{border-left:4px solid var(--quiet)}
@@ -339,17 +314,12 @@ details{border-top:1px solid var(--outline-soft);padding-top:9px}summary{cursor:
 </header>
 <section class="topbar">
   <div class="summary">
-    <h2 id="summary-title">$TODAY Daily Summary</h2>
-    <div id="summary-content">
-      $SUMMARY_HTML
-    </div>
-    <div class="summary-tabs" role="tablist" aria-label="Daily summaries">
-      $SUMMARY_TABS
-    </div>
-    <div class="summary-templates">
-      $SUMMARY_TEMPLATES
-    </div>
+    <h2>$TODAY Daily Summary</h2>
+    $SUMMARY_HTML
   </div>
+  <nav class="summary-pagination" aria-label="Daily summary pages">
+    $DUMMY_PAGINATION
+  </nav>
 </section>
 <section>
   <h2 class="board-title">Repo Board</h2>
@@ -371,22 +341,6 @@ details{border-top:1px solid var(--outline-soft);padding-top:9px}summary{cursor:
   </div>
 </section>
 </main>
-<script>
-document.querySelectorAll('.summary-tab').forEach((button) => {
-  button.addEventListener('click', () => {
-    const date = button.dataset.summaryDate;
-    const template = document.getElementById('summary-template-' + date);
-    const content = document.getElementById('summary-content');
-    const title = document.getElementById('summary-title');
-    if (!template || !content || !title) return;
-    content.innerHTML = template.innerHTML;
-    title.textContent = date + ' Daily Summary';
-    document.querySelectorAll('.summary-tab').forEach((tab) => {
-      tab.classList.toggle('active', tab === button);
-    });
-  });
-});
-</script>
 </body>
 </html>
 HTML
