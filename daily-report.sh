@@ -79,9 +79,8 @@ report_date = os.environ["REPORT_DATE"]
 current_day = os.environ["CURRENT_DAY"]
 repo_names = [name for name in os.environ["REPO_NAMES"].splitlines() if name]
 
-if report_date != current_day:
-    for zone in ("EDT", "EST"):
-        text = text.replace(f"{report_date} 00:00:00 {zone} to {report_date} 23:59:59 {zone}", report_date)
+for zone in ("EDT", "EST"):
+    text = re.sub(rf"{report_date} 00:00:00 {zone} to {report_date} [0-9]{{2}}:[0-9]{{2}}:[0-9]{{2}} {zone}", report_date, text)
 
 for name in sorted(repo_names, key=len, reverse=True):
     text = re.sub(rf"(?<![`\\w-]){re.escape(name)}(?![`\\w-])", f"`{name}`", text)
@@ -170,11 +169,7 @@ LAST_RUN_DATE=${LAST_RUN%%T*}
 LAST_RUN_HUMAN=$(iso_to_display_time "$LAST_RUN")
 REPO_COUNT="${#REPOS[@]}"
 REPO_NAMES=$(printf '%s\n' "${REPOS[@]##*/}")
-if [ "$TODAY" = "$CURRENT_DAY" ]; then
-  REPORT_WINDOW_LABEL="$LAST_RUN_HUMAN to $NOW_HUMAN"
-else
-  REPORT_WINDOW_LABEL="$TODAY"
-fi
+REPORT_WINDOW_LABEL="$TODAY"
 
 ACTIVE_COUNT=0
 TOTAL_RELEASES=0
