@@ -243,20 +243,12 @@ done
 [ -z "$BOARD_QUIET" ] && BOARD_QUIET="<div class=\"empty-lane\">No quiet repos.</div>"
 
 SUMMARY_HTML="<p class=\"muted\">Install an LLM CLI such as Claude to generate the plain-English narrative. The activity data below is still live from GitHub and the local mirrors.</p>"
-IMPACT_HTML="<li class=\"muted\">Business impact was not generated for this run.</li>"
 if [ ! -x "$CODEX_BIN" ] && command -v codex >/dev/null 2>&1; then
   CODEX_BIN="$(command -v codex)"
 fi
 
 if [ -x "$CODEX_BIN" ]; then
-  PROMPT="Write a concise daily executive engineering digest for Boundex covering $LAST_RUN_HUMAN to $NOW_HUMAN across $REPO_COUNT repos. The audience is business planning and external communications. Use Eastern Time when referring to the reporting window. Return exactly this format:
-SUMMARY:
-One or two plain-English paragraphs. Do not list every PR. Summarize concrete shipped work, fixes, and notable movement. Mention quiet repos briefly. Do not invent details.
-
-BUSINESS IMPACT:
-- Three to five concise bullets about business planning, external communications, partner/product impact, release readiness, or risk.
-
-Source data:
+  PROMPT="Write a concise daily development summary for Boundex covering $LAST_RUN_HUMAN to $NOW_HUMAN across $REPO_COUNT repos. Use Eastern Time when referring to the reporting window. Use plain text only: no Markdown headings, bold markers, bullets, or tables. Keep it easy to scan in one or two short paragraphs. Do not list every PR. Summarize concrete shipped work, fixes, and notable development movement. Mention quiet repos briefly. Do not invent details. Source data:
 $RAW_DATA"
   SUMMARY_FILE=$(mktemp "$WORKSPACE/.codex-summary.XXXXXX")
   SUMMARY=""
@@ -267,23 +259,11 @@ $RAW_DATA"
   fi
   rm -f "$SUMMARY_FILE"
   if [ -n "$SUMMARY" ]; then
-    SUMMARY_TEXT=$(printf '%s' "$SUMMARY" | awk 'BEGIN{s=0} /^SUMMARY:?$/ {s=1; next} /^BUSINESS IMPACT:?$/ {s=2; next} s==1 {print}')
-    IMPACT_TEXT=$(printf '%s' "$SUMMARY" | awk 'BEGIN{s=0} /^BUSINESS IMPACT:?$/ {s=1; next} s==1 {print}')
-    [ -z "$SUMMARY_TEXT" ] && SUMMARY_TEXT="$SUMMARY"
-    SUMMARY_ESCAPED=$(printf '%s' "$SUMMARY_TEXT" | sed '/^[[:space:]]*$/d' | html_escape | awk 'BEGIN{first=1} {if (!first) printf "<br>"; printf "%s", $0; first=0}')
+    SUMMARY_ESCAPED=$(printf '%s' "$SUMMARY" | sed '/^[[:space:]]*$/d' | html_escape | awk 'BEGIN{first=1} {if (!first) printf "<br>"; printf "%s", $0; first=0}')
     SUMMARY_HTML="<p>$SUMMARY_ESCAPED</p>"
-    IMPACT_HTML=$(printf '%s' "$IMPACT_TEXT" | sed 's/^[[:space:]]*[-*][[:space:]]*//' | sed '/^[[:space:]]*$/d' | while IFS= read -r line; do printf '<li>%s</li>\n' "$(printf '%s' "$line" | html_escape)"; done)
-    [ -z "$IMPACT_HTML" ] && IMPACT_HTML="<li class=\"muted\">No separate business impact bullets were generated.</li>"
   fi
 else
-  PROMPT="Write a concise daily executive engineering digest for Boundex covering $LAST_RUN_HUMAN to $NOW_HUMAN across $REPO_COUNT repos. The audience is business planning and external communications. Use Eastern Time when referring to the reporting window. Return exactly this format:
-SUMMARY:
-One or two plain-English paragraphs. Do not list every PR. Summarize concrete shipped work, fixes, and notable movement. Mention quiet repos briefly. Do not invent details.
-
-BUSINESS IMPACT:
-- Three to five concise bullets about business planning, external communications, partner/product impact, release readiness, or risk.
-
-Source data:
+  PROMPT="Write a concise daily development summary for Boundex covering $LAST_RUN_HUMAN to $NOW_HUMAN across $REPO_COUNT repos. Use Eastern Time when referring to the reporting window. Use plain text only: no Markdown headings, bold markers, bullets, or tables. Keep it easy to scan in one or two short paragraphs. Do not list every PR. Summarize concrete shipped work, fixes, and notable development movement. Mention quiet repos briefly. Do not invent details. Source data:
 $RAW_DATA"
   SUMMARY_FILE=$(mktemp "$WORKSPACE/.openai-summary.XXXXXX")
   PROMPT_FILE=$(mktemp "$WORKSPACE/.openai-prompt.XXXXXX")
@@ -313,13 +293,8 @@ PY
   fi
   rm -f "$SUMMARY_FILE" "$PROMPT_FILE"
   if [ -n "$SUMMARY" ]; then
-    SUMMARY_TEXT=$(printf '%s' "$SUMMARY" | awk 'BEGIN{s=0} /^SUMMARY:?$/ {s=1; next} /^BUSINESS IMPACT:?$/ {s=2; next} s==1 {print}')
-    IMPACT_TEXT=$(printf '%s' "$SUMMARY" | awk 'BEGIN{s=0} /^BUSINESS IMPACT:?$/ {s=1; next} s==1 {print}')
-    [ -z "$SUMMARY_TEXT" ] && SUMMARY_TEXT="$SUMMARY"
-    SUMMARY_ESCAPED=$(printf '%s' "$SUMMARY_TEXT" | sed '/^[[:space:]]*$/d' | html_escape | awk 'BEGIN{first=1} {if (!first) printf "<br>"; printf "%s", $0; first=0}')
+    SUMMARY_ESCAPED=$(printf '%s' "$SUMMARY" | sed '/^[[:space:]]*$/d' | html_escape | awk 'BEGIN{first=1} {if (!first) printf "<br>"; printf "%s", $0; first=0}')
     SUMMARY_HTML="<p>$SUMMARY_ESCAPED</p>"
-    IMPACT_HTML=$(printf '%s' "$IMPACT_TEXT" | sed 's/^[[:space:]]*[-*][[:space:]]*//' | sed '/^[[:space:]]*$/d' | while IFS= read -r line; do printf '<li>%s</li>\n' "$(printf '%s' "$line" | html_escape)"; done)
-    [ -z "$IMPACT_HTML" ] && IMPACT_HTML="<li class=\"muted\">No separate business impact bullets were generated.</li>"
   else
     SUMMARY_HTML="<p class=\"muted\">AI summary was not available for this run. The repo board below is still live from GitHub and the local mirrors.</p>"
   fi
@@ -352,7 +327,7 @@ done
 PAGINATION_HTML="<button type=\"button\" class=\"page-step\" data-step=\"prev\">Previous</button>$PAGINATION_HTML<button type=\"button\" class=\"page-step\" data-step=\"next\">Next</button>"
 
 BOARD_HTML="<div class=\"board\"><section class=\"lane\"><header><h2>Completed</h2><span class=\"lane-count\">Merged PRs</span></header>$BOARD_COMPLETED</section><section class=\"lane\"><header><h2>In Progress</h2><span class=\"lane-count\">Commits</span></header>$BOARD_IN_PROGRESS</section><section class=\"lane\"><header><h2>Quiet</h2><span class=\"lane-count\">No activity</span></header>$BOARD_QUIET</section></div>"
-REPORT_TEMPLATES="<template id=\"report-template-$TODAY\"><div data-summary-title>$TODAY Daily Summary</div><div data-summary-body>$SUMMARY_HTML</div><ul data-impact-list>$IMPACT_HTML</ul><div data-board>$BOARD_HTML</div></template>"
+REPORT_TEMPLATES="<template id=\"report-template-$TODAY\"><div data-summary-title>$TODAY Daily Summary</div><div data-summary-body>$SUMMARY_HTML</div><div data-board>$BOARD_HTML</div></template>"
 if ls "$HISTORY_DIR"/*.html >/dev/null 2>&1; then
   while IFS= read -r history_file; do
     history_date=$(basename "$history_file" .html)
@@ -370,18 +345,14 @@ def marker(name, fallback=""):
     return match.group(1).strip() if match else fallback
 
 summary = marker("summary-body", '<p class="muted">No archived summary available.</p>')
-impact = marker("impact-list", '<li class="muted">No archived business impact available.</li>')
 board = marker("board-body", '<div class="empty-lane">No archived board available.</div>')
 summary_match = re.search(r'<div id="summary-body">\s*(.*?)\s*</div>', summary, re.S)
 if summary_match:
     summary = summary_match.group(1).strip()
-impact_match = re.search(r'<ul id="impact-list">\s*(.*?)\s*</ul>', impact, re.S)
-if impact_match:
-    impact = impact_match.group(1).strip()
 board = board.strip()
 if board.startswith('<div id="board-body">') and board.endswith('</div>'):
     board = board[len('<div id="board-body">'):-len('</div>')].strip()
-print(f'<template id="report-template-{date}"><div data-summary-title>{date} Daily Summary</div><div data-summary-body>{summary}</div><ul data-impact-list>{impact}</ul><div data-board>{board}</div></template>')
+print(f'<template id="report-template-{date}"><div data-summary-title>{date} Daily Summary</div><div data-summary-body>{summary}</div><div data-board>{board}</div></template>')
 PY
 )
     REPORT_TEMPLATES+="$history_template"
@@ -405,7 +376,6 @@ h1{margin:0;font-size:20px;line-height:1.15;letter-spacing:0;font-weight:500}.me
 .topbar{margin-bottom:22px}
 .summary{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:22px 24px;box-shadow:var(--shadow-1);position:relative}.summary:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--primary);border-radius:8px 0 0 8px}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:700}.summary p{margin:0;font-size:15px;max-width:112ch}
 .summary-pagination{display:flex;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0 0}.summary-pagination button{appearance:none;border:1px solid var(--outline-soft);background:transparent;color:var(--muted);border-radius:8px;padding:7px 11px;font:inherit;font-size:12px;font-weight:500;line-height:1;cursor:pointer}.summary-pagination button:hover{border-color:#ffd7a3;color:var(--primary-dark);background:rgba(255,243,224,.5)}.summary-pagination button.active{background:#fff3e0;border-color:#ffd7a3;color:var(--primary-dark)}.summary-pagination button:disabled{cursor:not-allowed;opacity:.45;background:transparent}
-.impact{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:18px 20px;margin-top:14px;box-shadow:var(--shadow-1)}.impact h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 8px;font-weight:700}.impact ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 22px;padding-left:18px}.impact li{margin:0;font-size:13px}
 .board-wrap{overflow-x:auto;padding:2px 2px 14px}.board{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:18px;min-width:980px}
 .lane{background:var(--surface-variant);border:1px solid var(--outline-soft);border-radius:8px;padding:14px;min-height:380px}.lane header{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px;padding:0 2px 10px;border-bottom:1px solid var(--outline)}.lane h2{margin:0;font-size:16px;font-weight:500}.lane-count{color:var(--muted);font-size:12px;font-weight:500}
 .repo-card{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:15px;margin-bottom:12px;box-shadow:var(--shadow-1);transition:box-shadow .15s ease,transform .15s ease}.repo-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-2)}.repo-card.completed{border-left:4px solid var(--success)}.repo-card.active{border-left:4px solid var(--progress)}.repo-card.quiet{border-left:4px solid var(--quiet)}
@@ -413,7 +383,7 @@ h1{margin:0;font-size:20px;line-height:1.15;letter-spacing:0;font-weight:500}.me
 .count-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.count-row span{background:#fafafa;border:1px solid var(--outline-soft);border-radius:8px;padding:8px;font-size:12px;color:var(--muted)}.count-row b{display:block;color:var(--text);font-size:20px;font-weight:500;line-height:1.05}
 .card-actions{display:flex;gap:8px;margin-bottom:10px}.card-actions a{background:#fff3e0;border:1px solid #ffd7a3;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--primary-dark)}
 details{border-top:1px solid var(--outline-soft);padding-top:9px}summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:500}h3{font-size:11px;margin:12px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}ul{margin:0;padding-left:18px}li{margin:5px 0;font-size:13px;overflow-wrap:anywhere}li span{color:var(--muted)}.muted{color:var(--muted)}.empty-lane{border:1px dashed var(--outline);border-radius:8px;color:var(--muted);padding:18px;text-align:center;background:rgba(255,255,255,.68);font-size:13px;font-weight:500}
-@media(max-width:860px){main{padding:18px 12px 44px}.page-header{display:block;padding:2px 0}.brand-logo{width:28px;height:28px}h1{font-size:19px}.meta{display:inline-block;margin-top:8px;white-space:normal}.summary{padding:18px}.impact ul{grid-template-columns:1fr}.board{grid-template-columns:1fr;min-width:0}.board-wrap{overflow-x:visible}}
+@media(max-width:860px){main{padding:18px 12px 44px}.page-header{display:block;padding:2px 0}.brand-logo{width:28px;height:28px}h1{font-size:19px}.meta{display:inline-block;margin-top:8px;white-space:normal}.summary{padding:18px}.board{grid-template-columns:1fr;min-width:0}.board-wrap{overflow-x:visible}}
 </style>
 </head>
 <body>
@@ -437,14 +407,6 @@ details{border-top:1px solid var(--outline-soft);padding-top:9px}summary{cursor:
   <nav class="summary-pagination" aria-label="Daily summary pages">
     $PAGINATION_HTML
   </nav>
-  <div class="impact">
-    <h2>Business Impact</h2>
-    <!-- impact-list-start -->
-    <ul id="impact-list">
-      $IMPACT_HTML
-    </ul>
-    <!-- impact-list-end -->
-  </div>
 </section>
 <section>
   <h2 class="board-title">Repo Board</h2>
@@ -467,12 +429,10 @@ function showReport(date) {
 
   const title = template.content.querySelector('[data-summary-title]');
   const summary = template.content.querySelector('[data-summary-body]');
-  const impact = template.content.querySelector('[data-impact-list]');
   const board = template.content.querySelector('[data-board]');
 
   document.getElementById('summary-title').textContent = title.textContent;
   document.getElementById('summary-body').innerHTML = summary.innerHTML;
-  document.getElementById('impact-list').innerHTML = impact.innerHTML;
   document.getElementById('board-body').innerHTML = board.innerHTML;
 
   document.querySelectorAll('.page-number').forEach((button) => {
