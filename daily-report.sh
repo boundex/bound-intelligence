@@ -179,19 +179,22 @@ for entry in "${REPOS[@]}"; do
   [ -z "$commit_items" ] && commit_items="<li class=\"muted\">No commits found in the local mirror for this window.</li>"
 
   CARD_STATUS="Quiet"
+  CARD_SUBTITLE="No activity in this window"
   CARD_CLASS="quiet"
   CARD_BADGE="No activity"
   if [ "$pr_count" -gt 0 ]; then
     CARD_STATUS="Completed"
+    CARD_SUBTITLE="Merged PRs in this window"
     CARD_CLASS="completed"
     CARD_BADGE="Merged"
   elif [ "$commit_count" -gt 0 ]; then
     CARD_STATUS="In Progress"
+    CARD_SUBTITLE="Commits without merged PRs"
     CARD_CLASS="active"
     CARD_BADGE="Commits"
   fi
 
-  CARD_HTML="<article class=\"repo-card $CARD_CLASS\"><div class=\"card-top\"><div><a class=\"repo-name\" href=\"$repo_url\">$safe_name</a><div class=\"repo-subtitle\">$CARD_STATUS in this window</div></div><span class=\"badge\">$CARD_BADGE</span></div><div class=\"count-row\"><span><b>$release_count</b> releases</span><span><b>$pr_count</b> PRs</span><span><b>$commit_count</b> commits</span></div><div class=\"card-actions\"><a href=\"$pr_url\">Merged PRs</a><a href=\"$repo_url\">Repo</a></div><details><summary>Details</summary><div class=\"detail-stack\"><section><h3>Releases</h3><ul>$release_items</ul></section><section><h3>Merged PRs</h3><ul>$pr_items</ul></section><section><h3>Commits</h3><ul>$commit_items</ul></section></div></details></article>"$'\n'
+  CARD_HTML="<article class=\"repo-card $CARD_CLASS\"><div class=\"card-top\"><div><a class=\"repo-name\" href=\"$repo_url\">$safe_name</a><div class=\"repo-subtitle\">$CARD_SUBTITLE</div></div><span class=\"badge\">$CARD_BADGE</span></div><div class=\"count-row\"><span><b>$release_count</b> releases</span><span><b>$pr_count</b> merged PRs</span><span><b>$commit_count</b> commits</span></div><div class=\"card-actions\"><a href=\"$pr_url\">PR search</a><a href=\"$repo_url\">Repo</a></div><details><summary>Details</summary><div class=\"detail-stack\"><section><h3>Releases</h3><ul>$release_items</ul></section><section><h3>Merged PRs</h3><ul>$pr_items</ul></section><section><h3>Commits</h3><ul>$commit_items</ul></section></div></details></article>"$'\n'
   if [ "$pr_count" -gt 0 ]; then
     BOARD_COMPLETED+="$CARD_HTML"
   elif [ "$commit_count" -gt 0 ]; then
