@@ -10,3 +10,6 @@ GitHub Actions runs the same report daily. Required repository secrets:
 
 - `BOUND_REPO_TOKEN`: GitHub token with read access to the tracked Boundex repos.
 - `OPENAI_API_KEY`: OpenAI API key used for the daily written summary.
+
+The latest dashboard is published at `index.html`. Each run also updates a dated
+snapshot in `history/YYYY-MM-DD.html` so previous daily reports remain browsable.

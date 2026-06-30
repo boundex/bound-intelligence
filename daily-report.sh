@@ -9,8 +9,10 @@ GITHUB_ORG="boundex"
 STATE_FILE="$WORKSPACE/.daily-state.json"
 LOG_FILE="$WORKSPACE/.daily.log"
 REPORT="$WORKSPACE/repo-intelligence-report.html"
+HISTORY_DIR="$WORKSPACE/history"
 SYNC_SCRIPT="$WORKSPACE/sync.sh"
 CODEX_BIN="/Applications/Codex.app/Contents/Resources/codex"
+BASE_PATH="${BASE_PATH:-}"
 DISPLAY_TZ="America/New_York"
 TODAY=$(TZ="$DISPLAY_TZ" date "+%Y-%m-%d")
 NOW_HUMAN=$(TZ="$DISPLAY_TZ" date "+%Y-%m-%d %H:%M:%S %Z")
@@ -35,7 +37,7 @@ REPOS=(
   "docs_bound_exchange"
 )
 
-mkdir -p "$WORKSPACE/daily-reports"
+mkdir -p "$WORKSPACE/daily-reports" "$HISTORY_DIR"
 
 timestamp() { date "+%Y-%m-%d %H:%M:%S"; }
 html_escape() { jq -Rr @html; }
@@ -271,6 +273,16 @@ PY
   fi
 fi
 
+HISTORY_REPORT="$HISTORY_DIR/$TODAY.html"
+HISTORY_LINKS="<a class=\"nav-link\" href=\"$BASE_PATH/index.html\">Latest</a><a class=\"nav-link current\" href=\"$BASE_PATH/history/$TODAY.html\">$TODAY</a>"
+if ls "$HISTORY_DIR"/*.html >/dev/null 2>&1; then
+  while IFS= read -r history_file; do
+    history_date=$(basename "$history_file" .html)
+    [ "$history_date" = "$TODAY" ] && continue
+    HISTORY_LINKS+="<a class=\"nav-link\" href=\"$BASE_PATH/history/$history_date.html\">$history_date</a>"
+  done < <(find "$HISTORY_DIR" -maxdepth 1 -name '*.html' -print | sort -r | head -14)
+fi
+
 cat > "$REPORT.tmp" <<HTML
 <!doctype html>
 <html lang="en">
@@ -283,8 +295,9 @@ cat > "$REPORT.tmp" <<HTML
 *{box-sizing:border-box}body{margin:0;background:var(--background);color:var(--text);font-family:Roboto,Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
 a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 main{max-width:1440px;margin:0 auto;padding:28px 24px 56px}
-.page-header{display:flex;justify-content:space-between;gap:24px;align-items:center;margin-bottom:22px;padding:4px 2px 2px}.brand{display:flex;align-items:center;gap:10px}.brand-logo{width:30px;height:30px;object-fit:contain;display:block}
+.page-header{display:flex;justify-content:space-between;gap:24px;align-items:center;margin-bottom:14px;padding:4px 2px 2px}.brand{display:flex;align-items:center;gap:10px}.brand-logo{width:30px;height:30px;object-fit:contain;display:block}
 h1{margin:0;font-size:20px;line-height:1.15;letter-spacing:0;font-weight:500}.meta{color:var(--muted);font-size:13px;white-space:nowrap}
+.history-nav{display:flex;gap:8px;align-items:center;overflow-x:auto;margin:0 0 22px;padding:0 2px 4px}.nav-link{flex:0 0 auto;background:var(--surface);border:1px solid var(--outline-soft);border-radius:999px;color:var(--muted);font-size:12px;font-weight:500;padding:6px 11px}.nav-link.current{background:#fff3e0;border-color:#ffd7a3;color:var(--primary-dark)}.nav-link:hover{text-decoration:none;border-color:#ffd7a3;color:var(--primary-dark)}
 .topbar{margin-bottom:22px}
 .summary{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:22px 24px;box-shadow:var(--shadow-1);position:relative}.summary:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--primary);border-radius:8px 0 0 8px}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:700}.summary p{margin:0;font-size:15px;max-width:112ch}
 .board-wrap{overflow-x:auto;padding:2px 2px 14px}.board{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:18px;min-width:980px}
@@ -301,11 +314,14 @@ details{border-top:1px solid var(--outline-soft);padding-top:9px}summary{cursor:
 <main>
 <header class="page-header">
   <div class="brand">
-    <img class="brand-logo" src="assets/logo-bunny-mark.png" alt="" aria-hidden="true">
+    <img class="brand-logo" src="$BASE_PATH/assets/logo-bunny-mark.png" alt="" aria-hidden="true">
     <h1>BoundEx Intelligence</h1>
   </div>
   <div class="meta">Updated $NOW_HUMAN</div>
 </header>
+<nav class="history-nav" aria-label="Report history">
+  $HISTORY_LINKS
+</nav>
 <section class="topbar">
   <div class="summary">
     <h2>$TODAY Daily Summary</h2>
@@ -338,6 +354,7 @@ HTML
 
 mv "$REPORT.tmp" "$REPORT"
 cp "$REPORT" "$WORKSPACE/daily-reports/$TODAY.html"
+cp "$REPORT" "$HISTORY_REPORT"
 echo "{\"last_run\": \"$NOW_ISO\", \"window_start\": \"$LAST_RUN\", \"mode\": \"daily-window\"}" > "$STATE_FILE"
 echo "Daily report completed at $(timestamp): $REPORT" >> "$LOG_FILE"
 echo "========================================" >> "$LOG_FILE"
