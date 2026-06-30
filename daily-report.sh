@@ -93,7 +93,7 @@ code{background:#f0ece4;padding:2px 6px;border-radius:5px}
 </style>
 </head>
 <body><main>
-<h1>Boundex Repo Intelligence</h1>
+<h1>BoundEx Intelligence</h1>
 <div class="notice">
 <p><strong>Setup needed:</strong> this report needs <code>gh</code>, <code>git</code>, and <code>jq</code>.</p>
 <p>Install GitHub CLI, run <code>gh auth login</code>, then run <code>$WORKSPACE/daily-report.sh</code> again.</p>
@@ -283,7 +283,7 @@ cat > "$REPORT.tmp" <<HTML
 *{box-sizing:border-box}body{margin:0;background:var(--background);color:var(--text);font-family:Roboto,Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
 a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
 main{max-width:1440px;margin:0 auto;padding:28px 24px 56px}
-.page-header{display:flex;justify-content:space-between;gap:24px;align-items:center;margin-bottom:22px;padding:4px 2px 2px}
+.page-header{display:flex;justify-content:space-between;gap:24px;align-items:center;margin-bottom:22px;padding:4px 2px 2px}.brand{display:flex;align-items:center;gap:10px}.brand-logo{width:30px;height:30px;object-fit:contain;display:block}
 h1{margin:0;font-size:24px;line-height:1.15;letter-spacing:0;font-weight:500}.meta{color:var(--muted);font-size:13px;white-space:nowrap}
 .topbar{margin-bottom:22px}
 .summary{background:var(--surface);border:1px solid var(--outline-soft);border-radius:8px;padding:22px 24px;box-shadow:var(--shadow-1);position:relative}.summary:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--primary);border-radius:8px 0 0 8px}.summary h2,.board-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:700}.summary p{margin:0;font-size:15px;max-width:112ch}
@@ -294,14 +294,15 @@ h1{margin:0;font-size:24px;line-height:1.15;letter-spacing:0;font-weight:500}.me
 .count-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.count-row span{background:#fafafa;border:1px solid var(--outline-soft);border-radius:8px;padding:8px;font-size:12px;color:var(--muted)}.count-row b{display:block;color:var(--text);font-size:20px;font-weight:500;line-height:1.05}
 .card-actions{display:flex;gap:8px;margin-bottom:10px}.card-actions a{background:#fff3e0;border:1px solid #ffd7a3;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--primary-dark)}
 details{border-top:1px solid var(--outline-soft);padding-top:9px}summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:500}h3{font-size:11px;margin:12px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}ul{margin:0;padding-left:18px}li{margin:5px 0;font-size:13px;overflow-wrap:anywhere}li span{color:var(--muted)}.muted{color:var(--muted)}.empty-lane{border:1px dashed var(--outline);border-radius:8px;color:var(--muted);padding:18px;text-align:center;background:rgba(255,255,255,.68);font-size:13px;font-weight:500}
-@media(max-width:860px){main{padding:18px 12px 44px}.page-header{display:block;padding:2px 0}h1{font-size:22px}.meta{display:inline-block;margin-top:8px;white-space:normal}.summary{padding:18px}.board{grid-template-columns:1fr;min-width:0}.board-wrap{overflow-x:visible}}
+@media(max-width:860px){main{padding:18px 12px 44px}.page-header{display:block;padding:2px 0}.brand-logo{width:28px;height:28px}h1{font-size:22px}.meta{display:inline-block;margin-top:8px;white-space:normal}.summary{padding:18px}.board{grid-template-columns:1fr;min-width:0}.board-wrap{overflow-x:visible}}
 </style>
 </head>
 <body>
 <main>
 <header class="page-header">
-  <div>
-    <h1>Boundex Repo Intelligence</h1>
+  <div class="brand">
+    <img class="brand-logo" src="assets/logo-bunny-mark.png" alt="" aria-hidden="true">
+    <h1>BoundEx Intelligence</h1>
   </div>
   <div class="meta">Updated $NOW_HUMAN</div>
 </header>
