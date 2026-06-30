@@ -314,7 +314,7 @@ details{border-top:1px solid var(--outline-soft);padding-top:9px}summary{cursor:
 <main>
 <header class="page-header">
   <div class="brand">
-    <img class="brand-logo" src="$BASE_PATH/assets/logo-bunny-mark.png" alt="" aria-hidden="true">
+    <img class="brand-logo" src="https://boundex.github.io/bound-intelligence/assets/logo-bunny-mark.png" alt="" aria-hidden="true">
     <h1>BoundEx Intelligence</h1>
   </div>
   <div class="meta">Updated $NOW_HUMAN</div>
